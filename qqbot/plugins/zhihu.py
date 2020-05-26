@@ -33,6 +33,8 @@ def get_zhihu_hot(n):
 
 @on_command('知乎热榜', aliases=['知乎热搜'], only_to_me = False)
 async def _(session: CommandSession):
+	if session.ctx.get('user_id') in (数据删除, 数据删除, 数据删除):
+		return None
 	global _can_zhihu
 	if(_can_zhihu == False):
 		await session.send("爬嘞您喽")
@@ -53,6 +55,8 @@ async def _(session: CommandSession):
 
 @on_command('禁止知乎热榜', aliases=['禁止知乎热搜'], only_to_me = False)
 async def _(session: CommandSession):
+	if session.ctx.get('user_id') in (数据删除, 数据删除, 数据删除):
+		return None
 	global _can_zhihu
 	_can_zhihu = False
 	await session.send(
@@ -61,6 +65,8 @@ async def _(session: CommandSession):
 	
 @on_command('可以知乎热榜', aliases=['可以知乎热搜'], only_to_me = False)
 async def _(session: CommandSession):
+	if session.ctx.get('user_id') in (数据删除, 数据删除, 数据删除):
+		return None
 	global _can_zhihu
 	_can_zhihu = True
 	await session.send(
