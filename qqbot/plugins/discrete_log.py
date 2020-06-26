@@ -1,6 +1,9 @@
 import nonebot
 from nonebot import on_command, CommandSession
 import requests
+import sys
+sys.path.insert(0, r"C:\Users\Administrator\Desktop\qqbot\qqbot\plugins")
+from blacklist import check_blacklist
 
 __plugin_name__ = '离散对数'
 __plugin_usage__ = r"""
@@ -31,7 +34,7 @@ print(m.log(base))
         
 @on_command('离散对数', only_to_me = False)
 async def _(session: CommandSession):    
-    if session.ctx.get('user_id') in (数据删除, 数据删除, 数据删除):
+    if check_blacklist(session.ctx.get('user_id')):
         return None
     arg = session.current_arg_text.strip().lower()
     if not arg:

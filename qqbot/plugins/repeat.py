@@ -1,6 +1,9 @@
 from nonebot import on_command, CommandSession, permission as perm
 from nonebot import on_natural_language, NLPSession, NLPResult
 from nonebot.message import unescape
+import sys
+sys.path.insert(0, r"C:\Users\Administrator\Desktop\qqbot\qqbot\plugins")
+from blacklist import check_blacklist
 
 __plugin_name__ = '打断复读'
 __plugin_usage__ = r"""
@@ -11,7 +14,7 @@ __plugin_usage__ = r"""
 
 @on_command('说打断', only_to_me = False)
 async def pleasebanit(session: CommandSession):
-	if session.ctx.get('user_id') in (数据删除, 数据删除, 数据删除):
+	if check_blacklist(session.ctx.get('user_id')):
 		return None
 	await session.send("打断")
 
@@ -24,7 +27,7 @@ async def say(session: CommandSession):
 
 @on_command('复读', only_to_me = False)
 async def echo(session: CommandSession):
-	if session.ctx.get('user_id') in (数据删除, 数据删除, 数据删除):
+	if check_blacklist(session.ctx.get('user_id')):
 		return None
 	await session.send(session.state.get('message') or session.current_arg)
 
@@ -36,7 +39,7 @@ _can_repeat = True
 
 @on_natural_language(only_to_me = False)
 async def _(session: NLPSession):
-	if session.ctx.get('user_id') in (数据删除, 数据删除, 数据删除) or session.msg.strip()[0] == ".":
+	if check_blacklist(session.ctx.get('user_id')) or session.msg.strip()[0] == ".":
 		return None
 	group_id = session.ctx.get('group_id')
 	global group_list
@@ -70,7 +73,7 @@ async def _(session: NLPSession):
 
 @on_command('禁止打断', only_to_me = False)
 async def _(session: CommandSession):
-	if session.ctx.get('user_id') in (数据删除, 数据删除, 数据删除):
+	if check_blacklist(session.ctx.get('user_id')):
 		return None
 	global _can_break
 	_can_break = False
@@ -80,7 +83,7 @@ async def _(session: CommandSession):
 	
 @on_command('禁止复读', only_to_me = False)
 async def _(session: CommandSession):
-	if session.ctx.get('user_id') in (数据删除, 数据删除, 数据删除):
+	if check_blacklist(session.ctx.get('user_id')):
 		return None
 	global _can_repeat
 	_can_repeat = False
@@ -90,7 +93,7 @@ async def _(session: CommandSession):
 	
 @on_command('可以复读', only_to_me = False)
 async def _(session: CommandSession):
-	if session.ctx.get('user_id') in (数据删除, 数据删除, 数据删除):
+	if check_blacklist(session.ctx.get('user_id')):
 		return None
 	global _can_break
 	global _can_repeat
@@ -106,7 +109,7 @@ async def _(session: CommandSession):
 
 @on_command('可以打断', only_to_me = False)
 async def _(session: CommandSession):
-	if session.ctx.get('user_id') in (数据删除, 数据删除, 数据删除):
+	if check_blacklist(session.ctx.get('user_id')):
 		return None
 	global _can_break
 	global _can_repeat

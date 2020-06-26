@@ -3,7 +3,9 @@ from nonebot import on_command, CommandSession
 from pypinyin import Style, pinyin
 import sys
 sys.path.insert(0, r"C:\Users\Administrator\Desktop\qqbot\qqbot\plugins\my_emoji")
+sys.path.insert(0, r"C:\Users\Administrator\Desktop\qqbot\qqbot\plugins")
 import nmsl_local
+from blacklist import check_blacklist
 
 __plugin_name__ = '抽象话'
 __plugin_usage__ = r"""
@@ -21,7 +23,7 @@ def chouxiang_process(old_str):
     
 @on_command('抽象话', aliases=['抽象', '带话'], only_to_me = False)
 async def _(session: CommandSession):	
-	if session.ctx.get('user_id') in (数据删除, 数据删除, 数据删除):
+	if check_blacklist(session.ctx.get('user_id')):
 		return None
 	arg = session.current_arg_text.strip().lower()
 	if not arg:
