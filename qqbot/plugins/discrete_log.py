@@ -1,9 +1,9 @@
+import sys
+sys.path.insert(0, r"C:\Users\Administrator\Desktop\qqbot\qqbot\plugins")
 from blacklist import check_blacklist
 import nonebot
 from nonebot import on_command, CommandSession
 import requests
-import sys
-sys.path.insert(0, r"C:\Users\Administrator\Desktop\qqbot\qqbot\plugins")
 
 __plugin_name__ = '离散对数'
 __plugin_usage__ = r"""

@@ -1,9 +1,9 @@
+import sys
+sys.path.insert(0, r"C:\Users\Administrator\Desktop\qqbot\qqbot\plugins")
 from blacklist import check_blacklist
 from nonebot import on_command, CommandSession
 import nonebot
 import requests
-import sys
-sys.path.insert(0, r"C:\Users\Administrator\Desktop\qqbot\qqbot\plugins")
 
 __plugin_name__ = '知乎热榜'
 __plugin_usage__ = r"""

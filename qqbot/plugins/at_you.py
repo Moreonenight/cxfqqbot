@@ -1,10 +1,10 @@
+import sys
+sys.path.insert(0, r"C:\Users\Administrator\Desktop\qqbot\qqbot\plugins")
 from blacklist import check_blacklist, check_whitelist
 from nonebot import on_command, CommandSession
 from nonebot import on_natural_language, NLPSession, IntentCommand, NLPResult
 from urllib import parse
 from aiocqhttp.message import MessageSegment
-import sys
-sys.path.insert(0, r"C:\Users\Administrator\Desktop\qqbot\qqbot\plugins")
 
 __plugin_name__ = '@ta'
 __plugin_usage__ = r"""

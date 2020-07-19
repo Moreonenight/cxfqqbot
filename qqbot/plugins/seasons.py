@@ -1,10 +1,10 @@
-﻿from blacklist import check_blacklist
+﻿import sys
+sys.path.insert(0, r"C:\Users\Administrator\Desktop\qqbot\qqbot\plugins")
+from blacklist import check_blacklist
 from nonebot import on_command, CommandSession
 from nonebot import on_natural_language, NLPSession, IntentCommand, NLPResult
 from urllib import parse
 from time import sleep
-import sys
-sys.path.insert(0, r"C:\Users\Administrator\Desktop\qqbot\qqbot\plugins")
 
 __plugin_name__ = 'seasons有无'
 __plugin_usage__ = r"""

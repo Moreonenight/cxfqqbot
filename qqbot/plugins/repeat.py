@@ -1,9 +1,9 @@
+import sys
+sys.path.insert(0, r"C:\Users\Administrator\Desktop\qqbot\qqbot\plugins")
 from blacklist import check_blacklist
 from nonebot import on_command, CommandSession, permission as perm
 from nonebot import on_natural_language, NLPSession, NLPResult
 from nonebot.message import unescape
-import sys
-sys.path.insert(0, r"C:\Users\Administrator\Desktop\qqbot\qqbot\plugins")
 
 __plugin_name__ = '打断复读'
 __plugin_usage__ = r"""

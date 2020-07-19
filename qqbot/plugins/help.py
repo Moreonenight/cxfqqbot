@@ -1,9 +1,8 @@
+import sys
+sys.path.insert(0, r"C:\Users\Administrator\Desktop\qqbot\qqbot\plugins")
 from blacklist import check_blacklist, check_whitelist
 import nonebot
 from nonebot import on_command, CommandSession
-import sys
-sys.path.insert(0, r"C:\Users\Administrator\Desktop\qqbot\qqbot\plugins")
-
 
 @on_command('help', aliases=['使用帮助', '帮助', '使用方法', 'man', 'manual'])
 async def _(session: CommandSession):

@@ -1,12 +1,12 @@
+import sys
+sys.path.insert(
+    0, r"C:\Users\Administrator\Desktop\qqbot\qqbot\plugins\my_emoji")
+sys.path.insert(0, r"C:\Users\Administrator\Desktop\qqbot\qqbot\plugins")
 from blacklist import check_blacklist
 import nmsl_local
 import nonebot
 from nonebot import on_command, CommandSession
 from pypinyin import Style, pinyin
-import sys
-sys.path.insert(
-    0, r"C:\Users\Administrator\Desktop\qqbot\qqbot\plugins\my_emoji")
-sys.path.insert(0, r"C:\Users\Administrator\Desktop\qqbot\qqbot\plugins")
 
 __plugin_name__ = '抽象话'
 __plugin_usage__ = r"""
