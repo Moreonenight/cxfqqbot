@@ -4,6 +4,7 @@ from blacklist import check_blacklist, check_whitelist
 import nonebot
 import csv
 from nonebot import on_command, CommandSession
+import editdistance
 
 __plugin_name__ = '查询'
 __plugin_usage__ = r"""
@@ -54,10 +55,19 @@ def get_by_name(name):
         mylist = []
         for row in spamreader:
             if row[1] == name:
-                mylist.append(row)
+                mylist.append(row) 
         csvfile.close()
         return mylist
 
+def get_by_name_fuzzy(name):
+    with open(r'C:\Users\Administrator\Desktop\qqbot\qqbot\plugins\database\CompleteOutput.csv', 'r', newline='') as csvfile:
+        spamreader = csv.reader(csvfile, dialect='excel')
+        mylist = []
+        for row in spamreader:
+            if editdistance.eval(row[1], name) in (0, 1):
+                mylist.append(row)        
+        csvfile.close()
+        return mylist
 
 def get_by_id(id):
     with open(r'C:\Users\Administrator\Desktop\qqbot\qqbot\plugins\database\CompleteOutput.csv', 'r', newline='') as csvfile:
@@ -94,6 +104,11 @@ async def _(session: CommandSession):
     if mylist:
         await session.send("\n".join((i[0] + " " + i[1] + " " + i[2] + " " + i[3] + " " + i[4]) for i in mylist))
     else:
+        if arg.encode('UTF-8').isalnum() == False:
+            mylist = get_by_name(arg)
+            if mylist:
+                await session.send("本次查询无结果。但你是否在找：\n" + "\n".join((i[0] + " " + i[1] + " " + i[2] + " " + i[3] + " " + i[4] + " " + i[5]) for i in mylist))
+                return
         await session.send("本次查询无结果")
     return
 
@@ -123,6 +138,11 @@ async def _(session: CommandSession):
             base_str_list.append(base_str)
         await session.send("\n".join(k for k in base_str_list))
     else:
+        if arg.encode('UTF-8').isalnum() == False:
+            mylist = get_by_name(arg)
+            if mylist:
+                await session.send("本次查询无结果。但你是否在找：\n" + "\n".join((i[0] + " " + i[1] + " " + i[2] + " " + i[3] + " " + i[4] + " " + i[5]) for i in mylist))
+                return    
         await session.send("本次查询无结果")
     return
 
@@ -140,6 +160,11 @@ async def _(session: CommandSession):
     if mylist:
         await session.send("\n".join((i[0] + " " + i[1] + " " + i[2] + " " + i[3] + " " + i[4] + " " + i[6]) for i in mylist))
     else:
+        if arg.encode('UTF-8').isalnum() == False:
+            mylist = get_by_name(arg)
+            if mylist:
+                await session.send("本次查询无结果。但你是否在找：\n" + "\n".join((i[0] + " " + i[1] + " " + i[2] + " " + i[3] + " " + i[4] + " " + i[5]) for i in mylist))
+                return    
         await session.send("本次查询无结果")
     return
 
@@ -158,6 +183,11 @@ async def _(session: CommandSession):
         await session.send(
             "\n".join((i[0] + " " + i[1] + " " + i[2] + " " + i[3] + " " + i[4] + " " + i[5]) for i in mylist))
     else:
+        if arg.encode('UTF-8').isalnum() == False and len(arg) > 2:
+            mylist = get_by_name_fuzzy(arg)
+            if mylist and len(mylist) <= 20:
+                await session.send("本次查询无结果。但你是否在找：\n" + "\n".join((i[0] + " " + i[1] + " " + i[2] + " " + i[3] + " " + i[4] + " " + i[5]) for i in mylist))
+                return    
         await session.send("本次查询无结果")
     return
 
