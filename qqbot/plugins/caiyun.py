@@ -125,7 +125,7 @@ async def _(session: CommandSession):
         grand_data_dict[user_id][group_id] = {
             "title": "", "content": "", "currentOptions": [""], "model": "小梦0号", "nid": None}
     if arg.startswith("切换模型"):
-        grand_data_dict[user_id][group_id] = arg.split()[1]
+        grand_data_dict[user_id][group_id]["model"] = arg.split()[1]
         await session.send("您使用的模型已切换为" + arg.split()[1])
         with open("contents.pickle", "wb") as pickleFile:
             pickle.dump(grand_data_dict, pickleFile)
@@ -136,9 +136,10 @@ async def _(session: CommandSession):
         except(KeyError):
             await session.send("写作模型不存在，请切换为正确的模型")
             return
-        grand_data_dict[user_id][group_id]["content"] += grand_data_dict[user_id][group_id]["currentOptions"][0]
         if len(arg) != 2 and len(arg.split()) != 1:
             grand_data_dict[user_id][group_id]["content"] += arg[2:].strip()
+        else:
+            grand_data_dict[user_id][group_id]["content"] += grand_data_dict[user_id][group_id]["currentOptions"][0]
         if grand_data_dict[user_id][group_id]["title"] == "" and grand_data_dict[user_id][group_id]["content"] == "":
             await session.send("标题和内容不能全空，请先“彩云小梦 设置标题 [标题]”或“彩云小梦 设置内容 [内容]”")
             return
