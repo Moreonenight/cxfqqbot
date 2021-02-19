@@ -167,7 +167,10 @@ async def _(session: CommandSession):
                 await session.send("写作模型不存在，请切换为正确的模型")
                 return
             novel_text_list = await get_novel(grand_data_dict[user_id][group_id]["title"], grand_data_dict[user_id][group_id]["content"], mid, grand_data_dict[user_id][group_id]["nid"])
-            grand_data_dict[user_id][group_id]["currentOptions"] = novel_text_list
+            if novel_text_list:
+                grand_data_dict[user_id][group_id]["currentOptions"] = novel_text_list
+            else:
+                return session.send("彩云小梦似乎出了些故障，请重新尝试续写")
         result = grand_data_dict[user_id][group_id]["currentOptions"][0]
         if len(grand_data_dict[user_id][group_id]["content"]) >= 100:
             result = "[" + grand_data_dict[user_id][group_id]["content"][-100:] + "]" + result
@@ -186,14 +189,14 @@ async def _(session: CommandSession):
         return
     if arg.startswith("设置标题"):
         if len(arg) != 2 and len(arg.split()) != 1:
-            grand_data_dict[user_id][group_id]["title"] += arg[4:].strip()
+            grand_data_dict[user_id][group_id]["title"] = arg[4:].strip()
             await session.send("标题设置成功")
             with open("contents.pickle", "wb") as pickleFile:
                 pickle.dump(grand_data_dict, pickleFile)
         return
     if arg.startswith("设置内容"):
         if len(arg) != 2 and len(arg.split()) != 1:
-            grand_data_dict[user_id][group_id]["content"] += arg[4:].strip()
+            grand_data_dict[user_id][group_id]["content"] = arg[4:].strip()
             await session.send("内容设置成功")
             with open("contents.pickle", "wb") as pickleFile:
                 pickle.dump(grand_data_dict, pickleFile)
