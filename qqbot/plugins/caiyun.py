@@ -1,12 +1,12 @@
 import sys
 sys.path.insert(0, r"C:\Users\Administrator\Desktop\qqbot\qqbot\plugins")
-from blacklist import check_blacklist, check_whitelist
-import requests
-import json
-import pickle
-import asyncio
-import nonebot
 from nonebot import on_command, CommandSession
+import nonebot
+import asyncio
+import pickle
+import json
+import requests
+from blacklist import check_blacklist, check_whitelist
 __plugin_name__ = '彩云小梦'
 __plugin_usage__ = r"""
 彩云小梦
@@ -21,6 +21,7 @@ __plugin_usage__ = r"""
 彩云小梦 切换结果：显示下一条结果
 彩云小梦 全文：显示全部已写内容
 彩云小梦 重置：回到初始状态
+彩云小梦 复制 [QQ号]：复制目标QQ号在当前群聊的续写进度作为自己的续写进度。请注意这会导致自己的续写进度被覆盖。
 """.strip()
 
 # This uid is prescribed in JavaScripts.
@@ -86,7 +87,9 @@ async def get_novel(title, content, mid, nid):
     if xid is not None:
         novel_dream_loop_url = "http://if.caiyunai.com/v1/dream/" + uid + "/novel_dream_loop"
         novel_dream_loop_data = {"nid": nid, "xid": xid, "ostype": ""}
-        while(True):
+        failCounter = 0
+        while(failCounter < 60):
+            failCounter += 1
             await asyncio.sleep(0.5)
             novel_dream_loop_r = requests.post(
                 novel_dream_loop_url, headers=headers, json=novel_dream_loop_data)
@@ -96,11 +99,13 @@ async def get_novel(title, content, mid, nid):
                 for item in novel_dream_loop_result["data"]["rows"]:
                     result.append(item["content"])
                 return result
+        return None
 
 
 @on_command('彩云小梦', only_to_me=False)
 async def _(session: CommandSession):
     global grand_data_dict
+    RETROSPECTION_LENGTH = 20
     user_id = session.ctx.get('user_id')
     if check_blacklist(user_id):
         return None
@@ -136,7 +141,7 @@ async def _(session: CommandSession):
         except(KeyError):
             await session.send("写作模型不存在，请切换为正确的模型")
             return
-        if len(arg) != 2 and len(arg.split()) != 1:
+        if len(arg.split()) != 1:
             grand_data_dict[user_id][group_id]["content"] += arg[2:].strip()
         else:
             grand_data_dict[user_id][group_id]["content"] += grand_data_dict[user_id][group_id]["currentOptions"][0]
@@ -147,10 +152,15 @@ async def _(session: CommandSession):
             grand_data_dict[user_id][group_id]["nid"] = get_nid(
                 grand_data_dict[user_id][group_id]["title"], grand_data_dict[user_id][group_id]["content"])
         novel_text_list = await get_novel(grand_data_dict[user_id][group_id]["title"], grand_data_dict[user_id][group_id]["content"], mid, grand_data_dict[user_id][group_id]["nid"])
+        if novel_text_list:
+            grand_data_dict[user_id][group_id]["currentOptions"] = novel_text_list
+        else:
+            await session.send("彩云小梦似乎出了些故障，请重新尝试续写")
+            return
         grand_data_dict[user_id][group_id]["currentOptions"] = novel_text_list
         result = grand_data_dict[user_id][group_id]["currentOptions"][0]
-        if len(grand_data_dict[user_id][group_id]["content"]) >= 100:
-            result = "[" + grand_data_dict[user_id][group_id]["content"][-100:] + "]" + result
+        if len(grand_data_dict[user_id][group_id]["content"]) >= RETROSPECTION_LENGTH:
+            result = "[" + grand_data_dict[user_id][group_id]["content"][-RETROSPECTION_LENGTH:] + "]" + result
         await session.send(result)
         with open("contents.pickle", "wb") as pickleFile:
             pickle.dump(grand_data_dict, pickleFile)
@@ -170,10 +180,11 @@ async def _(session: CommandSession):
             if novel_text_list:
                 grand_data_dict[user_id][group_id]["currentOptions"] = novel_text_list
             else:
-                return session.send("彩云小梦似乎出了些故障，请重新尝试续写")
+                await session.send("彩云小梦似乎出了些故障，请重新尝试切换结果")
+                return
         result = grand_data_dict[user_id][group_id]["currentOptions"][0]
-        if len(grand_data_dict[user_id][group_id]["content"]) >= 100:
-            result = "[" + grand_data_dict[user_id][group_id]["content"][-100:] + "]" + result
+        if len(grand_data_dict[user_id][group_id]["content"]) >= RETROSPECTION_LENGTH:
+            result = "[" + grand_data_dict[user_id][group_id]["content"][-RETROSPECTION_LENGTH:] + "]" + result
         await session.send(result)
         with open("contents.pickle", "wb") as pickleFile:
             pickle.dump(grand_data_dict, pickleFile)
@@ -188,18 +199,48 @@ async def _(session: CommandSession):
             pickle.dump(grand_data_dict, pickleFile)
         return
     if arg.startswith("设置标题"):
-        if len(arg) != 2 and len(arg.split()) != 1:
+        if len(arg.split()) != 1:
             grand_data_dict[user_id][group_id]["title"] = arg[4:].strip()
             await session.send("标题设置成功")
             with open("contents.pickle", "wb") as pickleFile:
                 pickle.dump(grand_data_dict, pickleFile)
+        else:
+            await session.send("已将内容清空")
+        with open("contents.pickle", "wb") as pickleFile:
+            pickle.dump(grand_data_dict, pickleFile)
         return
     if arg.startswith("设置内容"):
-        if len(arg) != 2 and len(arg.split()) != 1:
+        if len(arg.split()) != 1:
             grand_data_dict[user_id][group_id]["content"] = arg[4:].strip()
+            grand_data_dict[user_id][group_id]["currentOptions"][0] = ""
             await session.send("内容设置成功")
-            with open("contents.pickle", "wb") as pickleFile:
-                pickle.dump(grand_data_dict, pickleFile)
+        else:
+            await session.send("已将内容清空")
+        with open("contents.pickle", "wb") as pickleFile:
+            pickle.dump(grand_data_dict, pickleFile)
+        return
+    if arg.startswith("复制"):
+        if len(arg.split()) != 1:
+            objectiveUserId = arg[2:].strip()
+            try:
+                objectiveUserId = int(objectiveUserId)
+            except(ValueError, TypeError):
+                await session.send("复制失败。目标QQ号必须是纯数字。")
+                return
+            if objectiveUserId in grand_data_dict.keys():
+                if group_id in grand_data_dict[objectiveUserId].keys():
+                    grand_data_dict[user_id][group_id] = grand_data_dict[objectiveUserId][group_id]
+                    await session.send("复制成功。")
+                    with open("contents.pickle", "wb") as pickleFile:
+                        pickle.dump(grand_data_dict, pickleFile)
+                    return
+                else:
+                    await session.send("复制失败。目标QQ号未在当前群聊进行过续写。")
+                    return
+            else:
+                await session.send("复制失败。目标QQ号未进行过续写。")
+                return
+        await session.send("复制失败。目标QQ号必须是纯数字。")
         return
     await session.send("未知命令，请输入“@[bot] help 彩云小梦”查看说明。")
     return
