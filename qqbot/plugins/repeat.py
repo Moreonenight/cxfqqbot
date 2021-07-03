@@ -1,9 +1,9 @@
 import sys
 sys.path.insert(0, r"C:\Users\Administrator\Desktop\qqbot\qqbot\plugins")
-from blacklist import check_blacklist
-from nonebot import on_command, CommandSession, permission as perm
-from nonebot import on_natural_language, NLPSession, NLPResult
 from nonebot.message import unescape
+from nonebot import on_natural_language, NLPSession, NLPResult
+from nonebot import on_command, CommandSession, permission as perm
+from blacklist import check_blacklist
 
 __plugin_name__ = '打断复读'
 __plugin_usage__ = r"""
@@ -30,6 +30,8 @@ async def say(session: CommandSession):
 @on_command('复读', only_to_me=False)
 async def echo(session: CommandSession):
     if check_blacklist(session.ctx.get('user_id')):
+        return None
+    if session.ctx.get('group_id') == 【数据删除】:
         return None
     await session.send(session.state.get('message') or session.current_arg)
 

@@ -9,4 +9,5 @@ autopep8 --in-place --aggressive --aggressive ./repeat.py
 autopep8 --in-place --aggressive --aggressive ./search.py
 autopep8 --in-place --aggressive --aggressive ./seasons.py
 autopep8 --in-place --aggressive --aggressive ./zhihu.py
+autopep8 --in-place --aggressive --aggressive ./godlike.py
 pause
