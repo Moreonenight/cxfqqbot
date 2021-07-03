@@ -12,7 +12,8 @@ from random import randint
 
 victim_list = []
 
-_can_random_check = True
+_can_auto_check = False
+_can_random_check = False
 
 
 def get_random_list():
@@ -112,18 +113,85 @@ def get_random_list():
             return random_check_list[tmp]
         else:
             victim_list.remove(tmp)
+            
+
+@nonebot.scheduler.scheduled_job('interval', minutes=20)
+async def _():
+    bot = nonebot.get_bot()
+    now = datetime.now(pytz.timezone('Asia/Shanghai'))
+    if now.hour >= 1 and now.hour <= 7:
+        return None
+    global _can_auto_check
+    if not _can_auto_check:
+        return None
+    check_list = get_random_list()
+    try:
+        await bot.send_group_msg(group_id= 【数据删除】,
+                                 message='抽查 '+ check_list[0])
+        delta = timedelta(seconds=60)
+        trigger = DateTrigger(
+            run_date=datetime.now() + delta
+        )
+        scheduler.add_job(
+            func=bot.send_group_msg, 
+            trigger=trigger,
+            kwargs= {'group_id': 【数据删除】, 'message': check_list[0] + "：" + check_list[1]},
+            misfire_grace_time=60, 
+        )    
+    except CQHttpError:
+        pass
 
 
 @on_command('抽查', only_to_me=False)
 async def random_check_function(session: CommandSession):
-    global check_process
+    global _can_random_check
     arg = session.current_arg_text.strip().lower()
     if arg:
         return None
-    await session.send("无法抽查菜鸡已经挂科的科目。")
+    if not _can_random_check:
+        await session.send(
+            '无法抽查菜鸡已经挂科的科目。')
+        return
+    check_list = get_random_list()
+    try:
+        await session.send('抽查 '+ check_list[0])
+        delta = timedelta(seconds=60)
+        trigger = DateTrigger(
+            run_date=datetime.now() + delta
+        )        
+        scheduler.add_job(
+            func=session.send,  
+            trigger=trigger,  
+            args=(check_list[0] + "：" + check_list[1],),  
+            misfire_grace_time=60,  
+        )    
+    except CQHttpError:
+        pass
 
 
 @on_command('关闭自动抽查', only_to_me=False)
+async def _(session: CommandSession):
+    global _can_auto_check
+    _can_auto_check = False
+    await session.send(
+        '收到')
+    return
+
+
+@on_command('开启自动抽查', only_to_me=False)
+async def _(session: CommandSession):
+    global _can_auto_check
+    global _can_random_check
+    if _can_random_check:
+        _can_auto_check = True
+        await session.send(
+            '收到')
+    else:
+        await session.send(
+            '无法抽查菜鸡已经挂科的科目。')        
+    return
+
+@on_command('关闭抽查', only_to_me=False)
 async def _(session: CommandSession):
     global _can_random_check
     _can_random_check = False
@@ -132,10 +200,10 @@ async def _(session: CommandSession):
     return
 
 
-@on_command('开启自动抽查', only_to_me=False)
+@on_command('开启抽查', only_to_me=False)
 async def _(session: CommandSession):
     global _can_random_check
     _can_random_check = True
     await session.send(
-        '无法抽查菜鸡已经挂科的科目。')
+        '收到')
     return
