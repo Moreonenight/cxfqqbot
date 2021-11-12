@@ -39,7 +39,7 @@ def get_zhihu_hot(n=0, start=0, search=None):
         for i in range(0, 50):
             tmp = str(i + 1) + '. ' + \
                 eval(r.text)["data"][i]["target"]["title"]
-            if tmp.find(search) != -1:
+            if tmp.lower().find(search) != -1:
                 src.append(tmp)
                 excerpt = eval(r.text)["data"][i]["target"]["excerpt"]
     else:
